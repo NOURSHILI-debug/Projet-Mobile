@@ -30,10 +30,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+    
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  smooth_page_indicator: ^1.2.1
+  google_fonts: ^6.3.2
+
+  # Backend : 
+  http: ^1.2.2
+  shared_preferences: ^2.2.3
 
 dev_dependencies:
   flutter_test:
@@ -87,3 +94,14 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+  fonts:
+    - family: StackSansText
+      fonts:
+        - asset: assets/fonts/Stack_Sans_Text/StackSansText-VariableFont_wght.ttf
+  
+  assets:
+      - assets/images/onboarding_screen/image1.jpg
+      - assets/images/onboarding_screen/image2.jpg
+      - assets/images/onboarding_screen/image3.jpg
+     
