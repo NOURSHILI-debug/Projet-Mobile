@@ -41,6 +41,7 @@ dependencies:
   # Backend : 
   http: ^1.2.2
   shared_preferences: ^2.2.3
+  flutter_dotenv: ^5.1.0
 
 dev_dependencies:
   flutter_test:
@@ -101,6 +102,7 @@ flutter:
         - asset: assets/fonts/Stack_Sans_Text/StackSansText-VariableFont_wght.ttf
   
   assets:
+      - .env
       - assets/images/onboarding_screen/image1.jpg
       - assets/images/onboarding_screen/image2.jpg
       - assets/images/onboarding_screen/image3.jpg
