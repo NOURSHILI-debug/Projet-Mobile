@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../services/auth_service.dart';
 import '../utils/token_storage.dart';
-
+import '../Widgets/Text_field.dart';
+import '../Widgets/button.dart';
+import '../Widgets/backbutton.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -13,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   Future<void> _login() async {
     final username = _usernameController.text.trim();
@@ -20,126 +24,146 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter the username and password")),
+        const SnackBar(content: Text("Please enter your username and password")),
       );
       return;
     }
 
     setState(() => _isLoading = true);
-
     final result = await AuthService.login(username, password);
-
     setState(() => _isLoading = false);
 
     if (result != null) {
       await TokenStorage.saveTokens(result['access']!, result['refresh']!);
+      final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('username', username);
+
       if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/home');
     } else {
       if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Invalid credentials")),
-        );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Invalid credentials")),
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
-        if (!didPop) {
-          Navigator.pushReplacementNamed(context, '/onboarding');
-        }
-      },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+      children: [
+        const CustomBackButton(),
+        SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
-                  "Welcome Back",
-                  style: TextStyle(
-                    fontFamily: 'StackSansText',
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
                 const SizedBox(height: 40),
 
-                TextField(
-                  controller: _usernameController,
-                  decoration: InputDecoration(
-                    labelText: "Username",
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.red),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
+                const Icon(Icons.fitness_center_rounded, color: Colors.red, size: 100),
+                const SizedBox(height: 15),
+
+                const Text(
+                  "GYMFLOW",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Alegreya SC',
+                    fontSize: 40,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.5,
                   ),
+                ),
+                const SizedBox(height: 100),
+
+                CustomTextField(
+                  controller: _usernameController,
+                  hintText: 'Username',
+                  prefixIcon: const Icon(Icons.person, color: Colors.white70),
                 ),
                 const SizedBox(height: 20),
 
-                TextField(
+                CustomTextField(
                   controller: _passwordController,
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "Password",
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(color: Colors.red),
-                      borderRadius: BorderRadius.circular(15),
+                  hintText: 'Password',
+                  prefixIcon: const Icon(Icons.lock_outline, color: Colors.white70),
+                  obscureText: _obscurePassword,
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.white70,
                     ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
+                    onPressed: () => setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    }),
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/forgot');
+                    },
+                    child: const Text(
+                      "Forgot Password?",
+                      style: TextStyle(color: Colors.red, fontSize: 14),
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 10),
 
-                SizedBox(
-                  width: double.infinity,
-                  height: 45,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
+                CustomButton(
+                  text: "Login",
+                  onPressed: _login,
+                  isLoading: _isLoading,
+                ),
+                const SizedBox(height: 30),
+
+                Row(
+                  children: const [
+                    Expanded(child: Divider(color: Colors.white24)),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Text("or continue with",
+                        style: TextStyle(color: Colors.white54, fontSize: 13)),
                     ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : ShaderMask(
-                            shaderCallback: (bounds) => const LinearGradient(
-                              colors: [Colors.black, Colors.white],
-                              stops: [0.3, 0.99],
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
-                            ).createShader(bounds),
-                            child: const Text(
-                              "Login",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'StackSansText',
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ),
-                  ),
+                    Expanded(child: Divider(color: Colors.white24)),
+                  ],
+                ),
+                const SizedBox(height: 25),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _socialButton(Icons.g_mobiledata_sharp, "Gmail"),
+                    const SizedBox(width: 20),
+                    _socialButton(Icons.facebook, "Facebook"),
+                  ],
                 ),
               ],
             ),
           ),
-        ),
+        ), 
+      ],
+    ),
+  );
+}
+
+
+  Widget _socialButton(IconData icon, String label) {
+    return Container(
+      width: 70,
+      height: 50,
+      decoration: BoxDecoration(
+        color: Colors.white10,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white24),
       ),
+      child: Icon(icon, color: Colors.white, size: 30),
     );
   }
 }

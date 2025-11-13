@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../Widgets/onboarding_page.dart';
+import '../Widgets/button.dart';
 
 class OnboardingScreen extends StatefulWidget {
 
@@ -30,28 +31,26 @@ class OnBoardingScreenState extends State<OnboardingScreen> {
               ),
               OnboardingPage(
                 imagePath: 'assets/images/onboarding_screen/image2.jpg',
-                title: "AAEHIZKJDN JIUFHNZE ZNAINAIDAAA",
-                description: 'dlkkjfnjzekjjenfjnfjfznfeenaenfzkfnzjfzadk,ada',
+                title: "Connect with Your Coach Instantly",
+                description: 'Get personalized guidance and support from certified trainers',
                 ),
               OnboardingPage(
                 imagePath: 'assets/images/onboarding_screen/image3.jpg',
-                title: "BBKJNEZJFZBBB",
-                description: 'dadzkjfkjenkfjzkfzkfjzkfkzjfnzkfkzfnfzjfnzfzznjkn!'
+                title: "Manage Your Gym Anytime",
+                description: 'Book classes, track attendance, and manage your membership all in one place!'
                 ),
             ],
           ),
           ExpandingDots(controller: _controller),
           GetStartedButton(),
-        ], 
-      )
+        ],
+      ),
     );
   }
 }
 
 class GetStartedButton extends StatelessWidget {
-  const GetStartedButton({
-    super.key,
-  });
+  const GetStartedButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -59,43 +58,25 @@ class GetStartedButton extends StatelessWidget {
       bottom: 120,
       left: 90,
       child: Center(
-        child : SizedBox(
-            width: 250,
-            height: 45,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/login');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15), 
-                ),
-              ),
-              child: ShaderMask(
-                shaderCallback: (bounds) => LinearGradient(
-                  colors: [Colors.black, Colors.white],
-                  stops: [0.3, 0.99],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ).createShader(bounds),
-                child: Text(
-                  "Get Started",
-                  style: TextStyle(
-                    color: Colors.white, // necessary for ShaderMask
-                    fontFamily: 'StackSansText',
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontStyle: FontStyle.italic
-                  ),
-                ),
-              ),
-            )
+        child: SizedBox(
+          width: 250,
+          height: 45,
+          child: CustomButton(
+            text: "Get Started",
+            fontFamily: 'StackSansText',
+            useGradientText: true,
+            onPressed: () {
+              Navigator.pushNamed(context, '/login');
+            },
           ),
-        )
+          
+        ),
+        
+      ),
     );
   }
 }
+
 
 class ExpandingDots extends StatelessWidget {
   const ExpandingDots({

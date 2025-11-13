@@ -5,7 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../utils/token_storage.dart';
 
 class AuthService {
-    static String get _baseUrl => "${dotenv.env['BACKEND_URL']}/api/auth";
+  static String get _baseUrl => "${dotenv.env['BACKEND_URL']}/api/auth";
 
   static Future<String> getInitialRoute() async {
     final prefs = await SharedPreferences.getInstance();
@@ -74,6 +74,12 @@ class AuthService {
     }
   } catch (_) {}
   return null;
-}
+  }
+  static Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('access');
+    await prefs.remove('refresh');
+    
+  }
 
 }
