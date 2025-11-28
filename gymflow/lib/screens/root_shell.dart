@@ -8,38 +8,39 @@ import 'dashboard/manage_users_screen.dart';
 import '../Widgets/custom_navbar.dart';
 
 class RootShell extends StatefulWidget {
-  final bool isAdmin = false; 
-  const RootShell({super.key});
+  final String role;
+
+  const RootShell({super.key, required this.role});
 
   @override
   State<RootShell> createState() => _RootShellState();
 }
 
 class _RootShellState extends State<RootShell> {
-  int _currentIndex = 2; // Home
+  int _currentIndex = 2;
   late PageController _pageController;
   late List<Widget> _screens;
+
+  bool _isAdmin(String role) => role == "ADMIN";
 
   @override
   void initState() {
     super.initState();
 
     _screens = [
-      const ScheduleScreen(), 
-      const ProgressScreen(), 
-      const HomeScreen(),     
-      const ChatScreen(),     
-      const ProfileScreen(),  
-      if (widget.isAdmin) const ManageUsersScreen(), 
+      const ScheduleScreen(),
+      const ProgressScreen(),
+      const HomeScreen(),
+      const ChatScreen(),
+      const ProfileScreen(),
+      if (_isAdmin(widget.role)) const ManageUsersScreen(),
     ];
 
     _pageController = PageController(initialPage: _currentIndex);
   }
 
   void _onTabSelected(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    setState(() => _currentIndex = index);
     _pageController.animateToPage(
       index,
       duration: const Duration(milliseconds: 300),
@@ -57,19 +58,13 @@ class _RootShellState extends State<RootShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-
       body: PageView(
         controller: _pageController,
-        onPageChanged: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        onPageChanged: (index) => setState(() => _currentIndex = index),
         children: _screens,
       ),
-
       bottomNavigationBar: CustomNavbar(
-        isAdmin: widget.isAdmin,
+        role: widget.role,     
         currentIndex: _currentIndex,
         onTabSelected: _onTabSelected,
       ),

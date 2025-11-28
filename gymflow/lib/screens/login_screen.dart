@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:gymflow/screens/root_shell.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 import '../services/auth_service.dart';
 import '../utils/token_storage.dart';
 import '../Widgets/Text_field.dart';
@@ -34,19 +36,30 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = false);
 
     if (result != null) {
-      await TokenStorage.saveTokens(result['access']!, result['refresh']!);
+      await TokenStorage.saveTokens(result['access'], result['refresh']);
+
+
+      final decoded = JwtDecoder.decode(result['access']);
+      final role = decoded["role"];     
+      final usernameFromToken = decoded["username"];
+
       final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('username', username);
+      await prefs.setString('username', usernameFromToken);
+      await prefs.setString('role', role);
+
 
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => RootShell(role: role)),
+      );
     } else {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Invalid credentials")),
       );
     }
-  }
+}
 
   @override
   Widget build(BuildContext context) {
