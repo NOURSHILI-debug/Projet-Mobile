@@ -7,26 +7,27 @@ import '../utils/token_storage.dart';
 class AuthService {
   static String get _baseUrl => "${dotenv.env['BACKEND_URL']}/api/auth";
 
-  static Future<String> getInitialRoute() async {
+  static Future<Map<String, dynamic>> getInitialRoute() async {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('access');
     final refreshToken = prefs.getString('refresh');
+    final role = prefs.getString("role") ?? "MEMBER";
 
     if (accessToken == null || refreshToken == null) {
-      return '/onboarding';
+      return {"route" : "/onboarding"};
     }
 
     final isValid = await validateToken(accessToken);
-    if (isValid) return '/home';
+    if (isValid) return {"route" : "/home", "role": role};
 
     final newAccess = await refreshAccessToken(refreshToken);
     if (newAccess != null) {
       await prefs.setString('access', newAccess);
-      return '/home';
+      return {"route" : "/home", "role": role};
     }
 
     await TokenStorage.clearTokens();
-    return '/onboarding';
+    return {"route" : "/onboarding"};
   }
 
   static Future<bool> validateToken(String token) async {
@@ -57,7 +58,7 @@ class AuthService {
     return null;
   }
 
-  static Future<Map<String, String>?> login(String username, String password) async {
+  static Future<Map<String, dynamic>?> login(String username, String password) async {
   try {
     final response = await http.post(
       Uri.parse("$_baseUrl/token/"),

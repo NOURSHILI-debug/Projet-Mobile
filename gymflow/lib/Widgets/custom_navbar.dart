@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 class CustomNavbar extends StatelessWidget {
-  final bool isAdmin;
+  final String role;
   final int currentIndex;
   final Function(int) onTabSelected;
 
   const CustomNavbar({
     super.key,
-    required this.isAdmin,
+    required this.role,
     required this.currentIndex,
     required this.onTabSelected,
   });
@@ -20,7 +20,7 @@ class CustomNavbar extends StatelessWidget {
       _NavItem(icon: Icons.home, index: 2),           // home
       _NavItem(icon: Icons.chat, index: 3),           // chat
       _NavItem(icon: Icons.person, index: 4),         // profile
-      if (isAdmin) _NavItem(icon: Icons.group, index: 5), // manage users
+      if (role == "ADMIN") _NavItem(icon: Icons.group, index: 5), // manage users
     ];
 
     return Container(
@@ -49,7 +49,7 @@ class CustomNavbar extends StatelessWidget {
           _buildItem(items[3]),
           const SizedBox(width: 25),
           _buildItem(items[4]),
-          if (isAdmin) ...[
+          if (role == "ADMIN") ...[
             const SizedBox(width: 25),
             _buildItem(items[5]),
           ]

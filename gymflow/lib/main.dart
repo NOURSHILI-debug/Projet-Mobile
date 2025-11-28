@@ -8,16 +8,17 @@ import 'services/auth_service.dart';
 
 void main() async {
   await dotenv.load(fileName: ".env");
-  
+
   WidgetsFlutterBinding.ensureInitialized();
-  final initialRoute = await AuthService.getInitialRoute();
-  runApp(GymApp(initialRoute: initialRoute));
+  final data = await AuthService.getInitialRoute();
+  
+  runApp(GymApp(home: data["route"] == "/home" ? RootShell(role: data["role"]) : null));
 }
 
 class GymApp extends StatelessWidget {
-  final String initialRoute;
+  final Widget? home;
 
-  const GymApp({super.key, required this.initialRoute});
+  const GymApp({super.key, this.home});
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +29,10 @@ class GymApp extends StatelessWidget {
         primarySwatch: Colors.red,
         useMaterial3: true,
       ),
-      initialRoute: initialRoute,
+      home: home ?? const OnboardingScreen(),
       routes: {
         '/onboarding': (context) => const OnboardingScreen(),
         '/login': (context) => const LoginScreen(),
-        '/home': (context) => const RootShell(),  
       },
     );
   }
