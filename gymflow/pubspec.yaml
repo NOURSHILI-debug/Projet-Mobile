@@ -43,6 +43,8 @@ dependencies:
   shared_preferences: ^2.2.3
   flutter_dotenv: ^5.1.0
   jwt_decoder: ^2.0.1
+  web_socket_channel: ^3.0.3
+  crypto: ^3.0.7
   
 
 dev_dependencies:
