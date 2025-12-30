@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'dashboard/home_screen.dart';
 import 'dashboard/schedule_screen.dart';
 import 'dashboard/progress_screen.dart';
-import 'dashboard/chat_screen.dart';
+import 'dashboard/Chat/chat_screen.dart';
 import 'dashboard/profile_screen.dart';
-import 'dashboard/manage_users_screen.dart';
+import 'dashboard/Manage_Members/manage_users_screen.dart';
 import '../Widgets/custom_navbar.dart';
 
 class RootShell extends StatefulWidget {

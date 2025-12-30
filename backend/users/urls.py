@@ -1,7 +1,10 @@
 from django.urls import path
-from .views import Register, get_users
+from .views import Register, get_users, delete_user
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 from .serializers import CustomTokenObtainPairSerializer
+
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('register/', Register.as_view(), name='register'),
@@ -9,4 +12,5 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('users/', get_users, name="users"),
-]
+    path('delete_user/<str:username>/',delete_user, name="delete_user"),
+] 
