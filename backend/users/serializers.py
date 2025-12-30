@@ -2,6 +2,14 @@ from .models import User
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
+
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        # We don't include 'password' here for security!
+        fields = ['username', 'email', 'age', 'role', 'profile_image']
+
+
 class RegisterSerializer(serializers.ModelSerializer):
     # make password write only (security)
     password = serializers.CharField(write_only=True) 

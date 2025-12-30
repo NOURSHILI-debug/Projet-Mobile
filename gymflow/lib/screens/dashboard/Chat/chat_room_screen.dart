@@ -6,9 +6,9 @@ import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-import '../../services/chat_service.dart';
-import '../../Widgets/Text_field.dart';
-import '../../Widgets/backbutton.dart';
+import '../../../services/chat_service.dart';
+import '../../../Widgets/Text_field.dart';
+import '../../../Widgets/backbutton.dart';
 
 
 class ChatRoomScreen extends StatefulWidget {
@@ -48,7 +48,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       final baseUrl = dotenv.env['BACKEND_URL'];
       
 
-      // 1. GENERATE SHARED UNIQUE ROOM ID
+      // 1. GENERATE UNIQUE ROOM ID
       
       List<String> participants = [myUsername, peerUsername];
       participants.sort();
@@ -113,7 +113,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         elevation: 0,
         leading: const CustomBackButton(),
         title: Text(
-          widget.displayName.toUpperCase(),
+          widget.displayName,
           style: const TextStyle(
             color: Colors.white,
             fontFamily: 'Alegreya SC',

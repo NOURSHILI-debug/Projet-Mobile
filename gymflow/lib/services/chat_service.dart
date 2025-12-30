@@ -7,7 +7,7 @@ class ChatService {
 
 
   static String get _baseUrl {
-    final rawUrl = dotenv.env['BACKEND_URL'] ?? "http://10.0.2.2:8000";
+    final rawUrl = dotenv.env['BACKEND_URL']!;
     final wsUrl = rawUrl.replaceFirst("http", "ws");
     return "$wsUrl/ws/chat";
   }
@@ -16,7 +16,6 @@ class ChatService {
       _channel = WebSocketChannel.connect(
         Uri.parse('$_baseUrl/$roomName/'),
       );
-      print("Connected to room: $roomName");
     } catch (e) {
       print("Connection error: $e");
     }
