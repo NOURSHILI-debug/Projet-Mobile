@@ -54,9 +54,18 @@ class _RootShellState extends State<RootShell> {
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
+@override
+Widget build(BuildContext context) {
+  return PopScope(
+    canPop: false, // Prevent from closing immediately when clicking back button
+    onPopInvokedWithResult: (didPop, result) {
+      if (didPop) return;
+
+      if (_currentIndex != 2) {
+        _onTabSelected(2);
+      }
+    },
+    child: Scaffold(
       backgroundColor: Colors.black,
       body: PageView(
         controller: _pageController,
@@ -68,6 +77,14 @@ class _RootShellState extends State<RootShell> {
         currentIndex: _currentIndex,
         onTabSelected: _onTabSelected,
       ),
+    ),
+  );
+}
+
+}
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+
     );
   }
-}

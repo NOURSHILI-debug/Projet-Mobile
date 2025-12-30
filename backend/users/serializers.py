@@ -9,6 +9,22 @@ class UserListSerializer(serializers.ModelSerializer):
         # We don't include 'password' here for security!
         fields = ['username', 'email', 'age', 'role', 'profile_image']
 
+class UserProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        # Username and Role are read-only
+        fields = ['email', 'age', 'profile_image']
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, min_length=6)
+
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Old password is incorrect.")
+        return value
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     # make password write only (security)
