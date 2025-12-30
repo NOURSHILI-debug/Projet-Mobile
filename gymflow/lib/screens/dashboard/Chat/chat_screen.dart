@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../utils/user_utils.dart'; // Adjust path based on your folders
+import '../../../utils/user_utils.dart';
 import 'chat_room_screen.dart';
 
 class ChatScreen extends StatefulWidget {
@@ -20,7 +20,6 @@ class _ChatScreenState extends State<ChatScreen> {
     _loadData();
   }
 
-  // Uses the centralized service
   Future<void> _loadData() async {
     try {
       final users = await UserUtils.fetchUsers();

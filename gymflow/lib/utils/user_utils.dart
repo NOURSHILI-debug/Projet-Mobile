@@ -52,33 +52,91 @@ class UserUtils {
   String? email,
   String? age,
   File? profileImage,
-}) async {
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString('access');
-  
-  var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/api/auth/register/'));
-  
-  // Headers
-  request.headers.addAll({
-    'Authorization': 'Bearer $token',
-  });
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access');
+    
+    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/api/auth/register/'));
+    
+    
+    request.headers.addAll({
+      'Authorization': 'Bearer $token',
+    });
 
-  // Text Fields
-  request.fields['username'] = username;
-  request.fields['password'] = password;
-  if (email != null && email.isNotEmpty) request.fields['email'] = email;
-  if (age != null && age.isNotEmpty) request.fields['age'] = age;
+    
+    request.fields['username'] = username;
+    request.fields['password'] = password;
+    if (email != null && email.isNotEmpty) request.fields['email'] = email;
+    if (age != null && age.isNotEmpty) request.fields['age'] = age;
 
-  // Image Field (Optional)
-  if (profileImage != null) {
-    request.files.add(await http.MultipartFile.fromPath(
-      'profile_image',
-      profileImage.path,
-    ));
+    if (profileImage != null) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'profile_image',
+        profileImage.path,
+      ));
+    }
+
+    var response = await request.send();
+    return response.statusCode == 201;
   }
 
-  var response = await request.send();
-  return response.statusCode == 201;
+  // Profile
+  static Future<Map<String, dynamic>> fetchProfile() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access');
+    final response = await http.get(
+      Uri.parse('$baseUrl/api/auth/profile/'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 200) return jsonDecode(response.body);
+    throw Exception('Failed to load profile');
+  }
+
+  static Future<bool> updateProfile({String? email, String? age, File? image}) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access');
+    var request = http.MultipartRequest('PATCH', Uri.parse('$baseUrl/api/auth/profile/'));
+    request.headers['Authorization'] = 'Bearer $token';
+
+    if (email != null) request.fields['email'] = email;
+    if (age != null) request.fields['age'] = age;
+    if (image != null) {
+      request.files.add(await http.MultipartFile.fromPath('profile_image', image.path));
+    }
+    var response = await request.send();
+    return response.statusCode == 200;
+  }
+
+  static Future<bool> changePassword(String oldPassword, String newPassword) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('access');
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/auth/change-password/'),
+      headers: {'Authorization': 'Bearer $token', 'Content-Type': 'application/json'},
+      body: jsonEncode({'old_password': oldPassword, 'new_password': newPassword}),
+    );
+    return response.statusCode == 200;
+  }
+
+  static Future<bool> removeProfilePicture() async {
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('access');
+
+  // We send a PATCH request with an empty string for the image field
+  
+  final response = await http.patch(
+    Uri.parse('$baseUrl/api/auth/profile/'),
+    headers: {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    },
+    body: jsonEncode({
+      'profile_image': null, 
+    }),
+  );
+
+  return response.statusCode == 200;
 }
+
   
 }
