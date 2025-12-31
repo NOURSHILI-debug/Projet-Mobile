@@ -1,10 +1,13 @@
 from rest_framework import generics, parsers, status
 from .models import User
+from chat.models import Message
 from .serializers import UserProfileUpdateSerializer, ChangePasswordSerializer, UserListSerializer, RegisterSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 from .permissions import IsAppAdmin 
+
+import hashlib
 
 class Register(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -25,13 +28,32 @@ def get_users(request):
 @permission_classes([IsAppAdmin]) # Only Admin can delete users
 def delete_user(request, username):
     try:
-        user = User.objects.get(username=username)    
-        user.delete()
-        return Response({"message": "User deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        user_to_delete = User.objects.get(username=username)
+        
+        other_usernames = User.objects.exclude(username=username).values_list('username', flat=True)
+        
+        hashes_to_wipe = []
+        
+        for other_name in other_usernames:
+            participants = [username, other_name]
+            participants.sort()
+            combined = "_".join(participants)
+            
+            room_hash = hashlib.sha256(combined.encode()).hexdigest()[:15]
+            hashes_to_wipe.append(room_hash)
+
+        self_combined = f"{username}_{username}"
+        self_hash = hashlib.sha256(self_combined.encode()).hexdigest()[:15]
+        hashes_to_wipe.append(self_hash)
+
+        Message.objects.filter(room_id__in=hashes_to_wipe).delete()
+        
+        user_to_delete.delete()
+        
+        return Response({"message": "User and chat history deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
     
     except User.DoesNotExist:
         return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
-    
 
 @api_view(['GET', 'PATCH'])
 @permission_classes([IsAuthenticated])

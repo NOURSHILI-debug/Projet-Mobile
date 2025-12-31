@@ -1,8 +1,11 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import Q
 from django.db.models.signals import post_delete, pre_save
 from django.dispatch import receiver
+
 import os
+import hashlib
 # Create your models here.
 
 class User(AbstractUser):
@@ -44,5 +47,4 @@ def delete_old_file_on_update(sender, instance, **kwargs):
     if not old_file == new_file:
         if old_file and os.path.isfile(old_file.path):
             os.remove(old_file.path)
-    
     
