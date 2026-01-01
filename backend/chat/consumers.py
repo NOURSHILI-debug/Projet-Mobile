@@ -46,14 +46,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         )
 
-    # 4. Receives the broadcast event and sends it to the specific Flutter client
+    # 4. Receives the broadcast event 
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
             'message': event['message'],
             'username': event['username']
         }))
 
-    # Updated Helper method to match your specific Message model
     @database_sync_to_async
     def save_message(self, username, room_id, message_content):
         try:
